@@ -1,0 +1,456 @@
+##
+##
+## Author: Y. Deville
+##
+## Convolution for Sea Levels.
+## 
+
+convSL <- function(dens.x,
+                   interp.x = "linear",
+                   shift.x = 0,
+                   threshold.y = 50,
+                   distname.y = "exponential",
+                   par.y = list(rate = 0.10),
+                   covpar.y = NULL,
+                   lambda = 1.0,            ## lambda is given in evt/year 
+                   conf.pct = c(95, 70),
+                   use.covlambda = "lambda" %in% colnames(covpar.y),
+                   prob = NULL,
+                   prob.max = 0.9995,
+                   pred.period = NULL,
+                   N = 1024,
+                   plim.y = c(1e-8, 1-1e-6),
+                   plot = TRUE,
+                   ylim = NULL,
+                   main = NULL,
+                   show.x = TRUE,
+                   trace = 1,
+                   ...) {
+  ## trace <- 0
+  DEBUG <- TRUE
+
+  mc <- match.call()
+
+  ##=================================================================
+  ## default prob for quantile and confidence lims 
+  ## should densify near 0 and 1
+  ##=================================================================
+  
+  if (is.null(prob)) {
+    prob <- c(## 0.0001,
+              ## seq(from = 0.01, to = 0.09, by = 0.01),
+              ## seq(from = 0.10, to = 0.80, by = 0.10),
+              seq(from = 0.90, to = 0.99, by = 0.01),
+              0.995, 0.996, 0.997, 0.998, 0.999,
+              0.9995, 0.9996, 0.9997, 0.9998, 0.9999)
+    prob <- prob[prob <= prob.max]
+  } else {
+    if (any(is.na(prob))) stop("'prob' values can not be NA") 
+    if ( any(prob <= 0) || any(prob >= 1) ) stop("'prob' values must be >0 and <1") 
+    prob <- sort(prob)
+  }
+
+  if (is.null(pred.period)) {
+    rr <- 3
+    pred.period <- (10^rr)*c(0.1, 0.2, 0.5, 1:10, 20, 50, 100)
+  } else {
+    if (any(is.na(pred.period))) stop("'pred.period' values can not be NA") 
+    pred.period <- sort(pred.period)
+  }
+
+  ##=================================================================
+  ## basic checks
+  ##=================================================================
+
+  nx <- length(dens.x$x)
+  if (nx < 16) stop("at least 16 points must be given in 'dens.x'")
+  
+  ## checks for density
+  if (is.unsorted(dens.x$x)) stop("unsorted x in dens.x")
+  if (any(is.na(dens.x$y))) stop("NA not allowed in dens.x$y")
+  if (any(dens.x$y < 0)) stop("<0 values not allowed in dens.x$y")
+  
+  if (any(dens.x$y[c(1, nx)]> 1e-6))
+    warning("dens.x$y should be 0 at both end points")
+  
+  ##==================================================================
+  ## Distribution names are as in 'fRenouv' function
+  ## Determination of the range of x and y
+  ##==================================================================
+  
+  special <- TRUE
+  
+  if (distname.y == "exponential") {
+    funname.y <- "exp"
+    parnames.y <- "rate"
+  } else if (distname.y == "weibull") {
+    funname.y <- "weibull"
+    parnames.y <- c("shape", "scale")
+  } else if (distname.y == "gpd") {
+    require(evd)                      ## At the time, evd is necessary
+    funname.y <- "gpd"
+    parnames.y <- c("scale", "shape")
+  } else if (distname.y %in% c("log-normal", "lognormal")) {
+    distname.y <- "log-normal"
+    funname.y <- "lnorm"
+    parnames.y <- c("meanlog", "sdlog")
+  } else if (distname.y == "gamma") {
+    funname.y <- "gamma"
+    parnames.y <- c("shape", "scale")
+  } else if (distname.y %in% c("MixExp2", "mixexp2")) {
+    distname.y <- "mixexp2"
+    funname.y <- "mixexp2"
+    parnames.y <- c("prob1", "rate1", "delta")
+  } else {
+    
+    special <- FALSE
+    
+    warning("warning: distribution not in target list. Still EXPERIMENTAL")
+    funname.y <- distname.y
+    
+  }
+
+  ##====================================================================
+  ## Wrapper functions
+  ## 
+  ## In this part, formals of functions are changed following the
+  ## ideas in "fitdistr" ogf the MASS package. See therein.
+  ##====================================================================
+  
+  ## reorder arguments to densfun and co
+  dfun.y <- get(paste("d", funname.y, sep = ""), mode = "function")
+  pfun.y <- get(paste("p", funname.y, sep = ""), mode = "function")
+  qfun.y <- get(paste("q", funname.y, sep = ""), mode = "function")
+  
+  fms <- formals(dfun.y)
+  args <- names(fms)
+  m <- match(parnames.y, args)  
+  if(any(is.na(m)))
+    stop("'parnames.y' specifies names which are not arguments to 'densfun'")
+  
+  ## 'x' is maintened in pole position '1', then come the params in parnames,
+  ## then the other if any (e.g. surrogate parameters)
+  formals(dfun.y) <- c(fms[c(1, m)], fms[-c(1, m)])
+  
+  ## Atention: in function call, remember to use  log = TRUE
+  
+  f.y <- function(parm, x) dfun.y(x, parm)
+  
+  ## Same thing for pfun. Note that although the main arg of
+  ## ditributions functions is usually names "q", we force it 
+  ## to be "x" here because f.y and F.y are usaed in the same
+  ## manner in the log-likelihood!
+  
+  fms <- formals(pfun.y)
+  args <- names(fms)
+  m <- match(parnames.y, args)
+  if(any(is.na(m)))
+    stop("parnames.y specifies names which are not arguments to 'pfun'")
+  
+  formals(pfun.y) <- c(fms[c(1, m)], fms[-c(1, m)])
+  
+  F.y <- function(parm, x) pfun.y(x, parm)
+  
+  ## reorder arguments to densfun
+  fms <- formals(qfun.y)
+  args <- names(fms)
+  m <- match(parnames.y, args)
+  if(any(is.na(m)))
+    stop("parnames.y specifies names which are not arguments to 'qfun'")
+  
+  formals(qfun.y) <- c(fms[c(1, m)], fms[-c(1, m)])
+  
+  q.y <- function(parm, p) qfun.y(p, parm)
+
+  par.y <- unlist(par.y)
+  p.y <- length(par.y)
+  str <- paste("parm[", 1:p.y, "]", collapse = ", ", sep = "")
+  parnames.y <- names(par.y)
+  
+  str <- paste(paste(paste(parnames.y,
+                           paste("parm[\"", parnames.y, "\"]", sep = ""),
+                           sep = " = "),
+                     collapse = ", "), sep = "")
+  
+  body(f.y) <- parse(text = paste("dfun.y(x,", str, ")"))     
+  body(F.y) <- parse(text = paste("pfun.y(x,", str, ")"))
+  body(q.y) <- parse(text = paste("qfun.y(p,", str, ")"))
+
+  
+  ##=========================================================================
+  ## grid computations and evaluations
+  ##
+  ## WARNING
+  ## the convolution is computed without threshold.
+  ##
+  ##=========================================================================
+  
+  ## grid characteristic for x
+  x.min  <- dens.x$x[1]
+  x.max  <- dens.x$x[nx]
+  xr <- x.max - x.min
+
+  ## The same for y
+
+  ylims <- q.y(par.y, p = plim.y)
+  
+  y.min <- ylims[1]
+  y.max <- ylims[2]
+  yr <- y.max - y.min
+  
+  ## grid step
+  h <- max(xr, yr) / N
+
+  xg  <- seq(from = x.min, by = h, length.out = N)
+  yg  <- seq(from = y.min, by = h, length.out = N)
+  
+  z.min <- x.min + y.min + threshold.y
+  zg <- seq(from = z.min, by = h, length.out = 2*N-1)
+  
+  ## Compute fX and FX.
+  ## fX is obtained by interpolation
+  if (interp.x == "linear") {
+    fxg <- approx(x = dens.x$x, y = dens.x$y, xout = xg)$y
+    fxg[is.na(fxg)] <- 0
+  } else if (interp.x == "logspline") {
+    require(splines)
+    sp <- interpSpline(obj1 = dens.x$x[2:(nx-1)],
+                       obj2 = log(dens.x$y[2:(nx-1)]))
+    fxg <- exp(predict(sp, x = xg)$y)
+    fxg[1] <- 0
+    fxg[N] <- 0
+  } else stop("bad value for 'interp.x'. Must be \"linear\" or \"logspline\"")
+    
+  ## (re)normalize
+  fxg <- fxg / sum(fxg) / h
+  
+  ## Fxg is only on used at return time
+  Fxg <- cumsum(fxg)*h
+  
+  ## Compute fY and FY
+  fyg <- f.y(par.y, x = yg)
+  Fyg <- F.y(par.y, x = yg)
+
+  fyg <- diff(c(Fyg, 1.0)) / h
+
+  fzg <- convolve(fxg, rev(fyg), type ="o")*h
+  condExp.x <- convolve((xg + h/2)*fxg, rev(fyg), type ="o")*h / fzg
+  
+  ## Fzg <- convolve(fxg, rev(Fyg), type ="o")*h
+
+  Fzg <- cumsum(fzg)*h
+
+  Tzg <- 1 / lambda / (1-Fzg)
+
+  ##==============================================================
+  ## DELTA METHOD
+  ## matrices for numerical derivation
+  ## The column ip of Parmat contains the parameter value with
+  ## a tiny modification of its ip component.
+  ##==============================================================
+
+  if (!is.null(covpar.y)) {
+
+    if ( (nrow(covpar.y) != ncol(covpar.y)) )
+      stop("covariance matrix 'covpar.y' not square!")
+
+    if ( is.null(colnames(covpar.y)) || is.null(colnames(covpar.y)))
+      stop("matrix 'covpar.y' must have rownames and colnames")
+
+    if (any(rownames(covpar.y) != rownames(covpar.y)))
+      stop("matrix 'covpar.y' must have identical rownames and colnames")
+
+    if ( !all(parnames.y %in% colnames(covpar.y)) ) {
+      stop("colnames(covpar.y) does not contain all par names")
+    }
+    
+    covpar.yy <- covpar.y[parnames.y, parnames.y, drop = FALSE]
+    
+    eps <- sqrt(.Machine$double.eps)
+    eps <- 0.0001
+    
+    dparms <- abs(par.y)*eps
+    dparms[dparms < eps] <- eps
+    
+    dFyg <- matrix(NA, nrow = N, ncol = p.y)
+    dFzg <- matrix(NA, nrow = length(Fzg), ncol = p.y)
+    dzzg <- matrix(NA, nrow = length(Fzg), ncol = p.y)
+    
+    colnames(dFyg) <- parnames.y
+    colnames(dFzg) <- parnames.y
+    colnames(dzzg) <- parnames.y
+    
+    for (ip in 1:p.y) {
+      par.plus <- par.y
+      par.plus[ip] <- par.plus[ip] +  dparms[ip]
+      par.minus <- par.y
+      par.minus[ip] <- par.minus[ip] - dparms[ip]
+      
+      dFyg[ , ip] <-
+        ( F.y(par.plus, x = yg) - F.y(par.minus, x = yg) ) / (2 *dparms[ip] )
+
+      ## cat("test ip =", ip, "\n")
+      ## print(dFyg)
+      
+      dFzg[ , ip] <- convolve(fxg, rev(dFyg[ , ip]), type ="o")*h
+      dzzg[ , ip] <- -dFzg[ , ip]/ fzg
+    }
+
+    
+    sig.Fyg <- sqrt(apply(dFyg, 1, function(x){t(x) %*% covpar.yy %*% x }))
+    sig.Fzg <- sqrt(apply(dFzg, 1, function(x){t(x) %*% covpar.yy %*% x }))
+
+    if (use.covlambda) {
+      cn.old <- colnames(dzzg)
+      dzzg <- cbind((1 - Fzg) / lambda / fzg, dzzg)
+      colnames(dzzg) <- c("lambda", cn.old)
+      sig.zzg <- sqrt(apply(dzzg, 1, function(x){t(x) %*% covpar.y %*% x }))
+    } else { 
+      sig.zzg <- sqrt(apply(dzzg, 1, function(x){t(x) %*% covpar.yy %*% x }))
+    }
+    
+  } else {
+    
+    sig.Fyg <- rep(NA, length(Fzg))
+    sig.Fzg <- rep(NA, length(Fzg))
+    sig.zzg <- rep(NA, length(Fzg))
+    
+  }
+  
+  ##============================================================================
+  ## Prepare results for RL plot
+  ##============================================================================
+  
+  nc <- 3 + 2*length(conf.pct)
+  cnames <-
+    c("prob", "period", "quant",
+      paste(rep(c("L", "U"), length(conf.pct)), rep(conf.pct, each = 2), sep = "."))
+  
+  ## Return levels (e.g. to be used in RLplot)
+  ret.lev <- matrix(NA, nrow = length(prob), ncol = nc)
+  rownames(ret.lev) <- prob
+  colnames(ret.lev) <- cnames
+
+  ind.nd <- !duplicated(Fzg)
+  Fzg.nd <- Fzg[ind.nd]
+  zg.nd <- zg[ind.nd]
+  
+  ret.lev[ , "prob"] <- prob
+  ret.lev[ , "period"] <- 1 / lambda / (1 - prob)
+  ret.lev[ , "quant"] <- approx(x = Fzg.nd, y = zg.nd, xout = prob)$y
+
+  zzg.app <- approx(x = Fzg.nd, y = zg.nd, xout = prob)$y
+  sig.zzg.app <- approx(x = zg, y = sig.zzg, xout = zzg.app)$y
+  
+  for (ipct in 1:length(conf.pct)) {
+    alpha.conf <- (100 - conf.pct[ipct])/100
+    z.conf <- qnorm(1 - alpha.conf/2)
+    ret.lev[ , 2*ipct + 2] <- zzg.app - z.conf * sig.zzg.app
+    ret.lev[ , 2*ipct + 3] <- zzg.app + z.conf * sig.zzg.app
+  }
+
+  ret.lev <- as.data.frame(ret.lev)
+  
+  ##============================================================================
+  ## Prepare a pred matrix 
+  ## Return levels (e.g. to be used in RLplot)
+  ## Note that pred.prob is computed from pred.period
+  ##
+  ##============================================================================
+  
+  pred.prob <- 1 - 1 / lambda / pred.period
+  ind <- (pred.prob>0) & (pred.prob < 1)
+  pred.period <- pred.period[ind]
+  pred.prob <- pred.prob[ind]
+  
+  pred <- matrix(NA, nrow = length(pred.period), ncol = nc)
+  rownames(pred) <- pred.period
+  colnames(pred) <- cnames
+  
+  pred[ , "period"] <- pred.period
+  pred[ , "prob"]  <- pred.prob
+  pred[ , "quant"] <- approx(x = Fzg.nd, y = zg.nd, xout = pred.prob)$y
+
+  zzg.app <- approx(x = Fzg.nd, y = zg.nd, xout = pred.prob)$y
+  sig.zzg.app <- approx(x = zg, y = sig.zzg, xout = zzg.app)$y
+  
+  for (ipct in 1:length(conf.pct)) {
+    alpha.conf <- (100 - conf.pct[ipct])/100
+    z.conf <- qnorm(1 - alpha.conf/2)
+    pred[ , 2*ipct + 2] <- zzg.app - z.conf * sig.zzg.app
+    pred[ , 2*ipct + 3] <- zzg.app + z.conf * sig.zzg.app
+  }
+
+  if (plot) {
+
+    SeaLev::RSLplot(data = ret.lev,
+                   lambda = lambda,
+                   conf.pct = conf.pct,
+                   mono = TRUE,
+                   main = main,
+                   ylim = ylim,
+                   ...)
+    
+    if (show.x) {
+      
+      abline(h = x.max, col = "gray")
+      mtext(side = 4, at = x.max, text = "HAT", col = "gray")
+      abline(h = x.max + threshold.y, col = "red")
+      mtext(side = 4, at = x.max+ threshold.y, text = "HAT + thresh.",
+            col = "red")
+
+      if (FALSE) {
+        if (uselambda.x) lambda.x <- lambda
+        else lambda.x <- 705.8
+        lines(x = -log( lambda.x * (1 - Fxg)),
+              y = xg,
+              col = "gray")
+      }
+        
+      lines(x = -log( lambda * (1 - Fzg)),
+            y = condExp.x,
+            col = "purple")
+
+      
+    }
+    
+  }
+
+  ## to be improved later 
+  if (distname.y == "exponential") {
+    Esp0 <-  sum(exp(xg*par.y["rate"]) * fxg)*h
+    Esp1 <-  sum(xg*exp(xg*par.y["rate"]) * fxg)*h
+    lmomExp <- c(log(Esp0), log(Esp1))
+    mu.z <- threshold.y + log(Esp0) / par.y["rate"]
+    sigma.z <- 1 / par.y["rate"]
+    theopar.z <- c(mu.z, sigma.z)
+    names(theopar.z) <- c("loc", "scale")
+    
+  } else {
+    lmomExp <- c(NA, NA)
+    theopar.z <- list()
+  }
+
+  ## tau <- 1 / rate / (1 - Fzg)
+
+  res <- list(call = mc,
+              threshold.y = threshold.y,
+              dens.x = list(x = xg, y = fxg),
+              dist.x = list(x = xg, y = Fxg),
+              dens.y = list(x = yg, y = fyg),
+              dist.y = list(x = yg, y = Fyg),
+              dens.z = list(x = zg, y = fzg),
+              dist.z = list(x = zg, y = Fzg),
+              z = zg,
+              Tz= Tzg,
+              logmomExp = lmomExp,
+              condExp.x = condExp.x,
+              theopar.z = theopar.z,
+              dFy = dFyg,
+              dFz = dFzg,
+              dzz = dzzg,
+              ret.lev = ret.lev,
+              pred = as.data.frame(pred))
+  
+}
+

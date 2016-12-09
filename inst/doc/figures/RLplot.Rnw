@@ -1,0 +1,162 @@
+\documentclass[a4,11pt]{article}
+
+%%=================================================================
+%% Utilisrer [trans] ou [handouts] pour eliminer les ``pause''
+%%=================================================================
+
+% Copyright 2003 by Till Tantau <tantau@cs.tu-berlin.de>.
+%
+% This program can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt.
+
+%
+% The purpose of this example is to show how \part can be used to
+% organize a lecture.
+%
+%%=================================================================
+%% Commentaire YVES DEVILLE 
+%% Ceci est pour faire en 4 transparents/pages.  Si
+%% pgfpages est installe correctement et en version recente.
+%%=================================================================
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsmath,bbold}
+\usepackage{natbib}
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{aeguill}
+\usepackage{textcomp}
+\usepackage{pdfcolmk}
+\usepackage{listings}
+\usepackage{fancybox}
+\lstloadlanguages{R}
+\lstloadlanguages{C}
+
+%\usepackage{pgfcore}
+\usepackage{pgf,pgfarrows}
+\usepackage{pgfpages}
+%%\pgfpagesuselayout{4 on 1}[a4paper, landscape]
+\usepackage{fullpage}
+
+\usepackage{tikz}
+\usepackage{fancybox}
+\usepackage{verbatim}
+
+\usepackage{hyperref}
+
+\hypersetup{%
+  hyperfigures=true,
+  hyperindex=true,
+  colorlinks=true,backref,
+  citecolor=blue,
+  linkcolor=blue}
+
+
+
+%%=============================================================================
+%% Couleurs
+%%=============================================================================
+%
+\definecolor{MonVert}{rgb}{0.398,0.801,0.000} 
+\definecolor{MonVertF}{rgb}{0.133,0.543,0.133}
+\definecolor{MonRouge}{rgb}{0.300,0.060,0.660}
+\definecolor{MonBleuC}{rgb}{0.000,0.602,0.801} 
+\definecolor{SteelBlue2}{rgb}{0.359375,0.671875,0.9296875}
+%%\definecolor{orange}{rgb}{0.8,0.1470,0.0}
+\definecolor{Orange}{rgb}{0.8,0.1470,0.0}
+\definecolor{SteelBlue4}{rgb}{0.212, 0.392, 0.545}
+\definecolor{SteelBlue3}{rgb}{0.30859,0.578125,0.800781}
+\definecolor{MonBleu}{rgb}{0.212, 0.392, 0.545}
+\definecolor{Violet}{rgb}{0.212, 0.392, 0.545}
+
+
+
+\title{RL plot explained}
+
+\author{Yves Deville}
+
+
+%%****************************************************************************
+\begin{document}
+\thispagestyle{empty}
+
+%% first page: copyright only
+\thispagestyle{empty}
+
+
+<<label="RLplot", dev="tikz", include=FALSE, fig.show="asis", fig.keep="last", fig.width=8, fig.height=6>>=
+library(SeaLev)
+data(Brest.tide)
+library(RColorBrewer)
+convSL <- convSL2
+data(Brest.tide)
+fit.gpd1 <- Renouv(x = Brest$OTdata$Surge,
+                   effDuration = as.numeric(Brest$OTinfo$effDuration),
+                   threshold = 50, distname.y = "GPD",
+                   plot = FALSE)
+cov1 <- vcov(fit.gpd1)
+u <- 50 
+theta.y <- coef(fit.gpd1)[-1]
+lambda <- coef(fit.gpd1)[1]
+theta.y["shape"] <- 0.05
+
+par(mar = c(5, 12, 5, 5), col.axis = "darkgray", las = 0,
+    col.lab = "darkgray")
+
+set.seed(123)
+w <- 200
+nz <- rpois(1, lambda = lambda * w)
+F <- cumsum(Brest.tide$y * diff(Brest.tide$x[1:2]))
+xmax <- max(Brest.tide$x)
+x <- approx(x = F, y = Brest.tide$x,  xout = runif(nz))$y
+## x <- Brest.tide$x[1] + (Brest.tide$x[length(Brest.tide$x)] - Brest.tide$x[1]) * x
+y <-  rGPD(nz, loc = u, shape = theta.y["shape"], scale = theta.y["scale"]) 
+z <- x  + y
+
+res <- convSL2(dens.x = Brest.tide,
+               threshold.y = 50, distname.y = "GPD",
+               lambda = lambda, par.y = theta.y, 
+               covpar.y = cov1,
+               pct.conf = 95,
+               ylim = c(320, 550),
+               Tlim = c(10, 4000),
+               main = "",
+               rl.mark = NULL,
+               z = z,
+               duration = w,
+               pch.points = 16,
+               col.points = translude("SeaGreen", alpha = 0.6),
+               plot = TRUE,
+               grid = FALSE,
+               filled.conf = TRUE,
+               show.asympt = FALSE,
+               legend = FALSE)
+
+## lines(log(res$Tz), res$z, log = "x", lwd = 3, type = "l", col = "orangered")
+
+T0 <- 1500
+z0 <- approx(x = res$Tz, y = res$z, xout = T0)$y
+x0 <- approx(x = res$Tz, y = res$condExp.x, xout = T0)$y
+
+abline(v = log(T0), lty = "dotted", lwd = 1.5)
+abline(h = c(x0, z0), lty = "dotted", lwd = 1.5)
+
+
+mtext("$\\textrm{E}[X \\vert Z = z(T)]$", las = 1, line = 2,
+     side = 2, at = x0, col = "black", cex = 1.5)
+
+mtext("$z(T)$", line = 2,
+      las = 1, side = 2, 
+      at = z0, col = "black", cex = 1.5)
+
+mtext("$x_{\\max} + u$", line = 2,
+      las = 1, side = 2, 
+      at = u + xmax, col = "black", cex = 1.5)
+
+mtext("$T$", at = log(T0), side = 1, line = 1.7, cex = 1.5)
+
+@     
+
+\end{document}

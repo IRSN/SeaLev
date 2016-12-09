@@ -1,0 +1,84 @@
+\begin{thebibliography}{{R D}10}
+
+\bibitem[{Col}90]{ColesCoastalFlood}
+{Coles S. and J.A. Tawn J.A.}
+\newblock Statistics of coastal flood prevention.
+\newblock {\em Philosphical Transactions of the Royal Society of London, series
+  A}, 332(1627):457--476, 1990.
+
+\bibitem[{Col}01]{COLESBOOK}
+{Coles, S.}
+\newblock {\em An Introduction to Statistical Modelling of Extreme Values}.
+\newblock Springer, 2001.
+
+\bibitem[{Col}05]{COLESBAYES}
+{Coles, S. and Tawn, J.A.}
+\newblock {Bayesian modelling of extreme surges on the UK east coast}.
+\newblock {\em {Phil. Trans. R. Soc. London A}}, 363:1387--1406, 2005.
+
+\bibitem[{de }01]{deBoor}
+{de Boor, C.}
+\newblock {\em {A Practical Guide to Splines, Revised Edition.}}
+\newblock Springer-Verlag, 2001.
+
+\bibitem[{Dix}94]{JPMREPORT}
+{Dixon, M.J. and Tawn, J.A.}
+\newblock {Extreme Sea Levels at the UK A-Class Sites}.
+\newblock Technical Report~65, {Proudman Oceanographic Laboratory}, 1994.
+
+\bibitem[{Pap}14]{PappAlizadeh}
+{Papp, D. and Alizadeh, F.}
+\newblock {Shape-Constrained Estimation Using Nonnegative Splines}.
+\newblock {\em J. Comput. Graph. Statist.}, 23(1):211--231, 2014.
+
+\bibitem[{Pug}79]{PUGHVASSIE79}
+{Pugh, D.T and Vassie, J.M}.
+\newblock {Extreme sea levels from tide and surge probability}.
+\newblock In {\em Proceedings of the 16th Coastal Engineering Conference,
+  1978}, volume~1, pages {911--930}. {American Society of Civil Engineers},
+  1979.
+
+\bibitem[{Pug}80]{PUGHVASSIE80}
+{Pugh, D.T and Vassie, J.M}.
+\newblock {Applications of the joint probability method for extreme sea level
+  computations}.
+\newblock {\em {Proc. Inst. Civil Eng. Part 2.}}, 69:{959--975}, 1980.
+
+\bibitem[{Pug}87]{PUGHBOOK1}
+{Pugh, D.T.}
+\newblock {\em {Tides, Surges and Mean Sea-Level}}.
+\newblock John Wiley, 1987.
+
+\bibitem[{Pug}04]{PUGHBOOK2}
+{Pugh, D.T.}
+\newblock {\em {Changing Sea Levels}}.
+\newblock Cambridge University Press, 2004.
+
+\bibitem[{R D}10]{RMANUAL}
+{R Development Core Team}.
+\newblock {\em {R: A Language and Environment for Statistical Computing}}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria, 2010.
+\newblock {ISBN} 3-900051-07-0.
+
+\bibitem[{Sim}07]{SIMON}
+{Simon, B.}
+\newblock {\em {La mar\'ee oc\'eanique et c\^{o}ti\`ere}}.
+\newblock Institut Oc\'eanographique, 2007.
+
+\bibitem[{Ste}02]{EVDRNEWS}
+{Stephenson, A.G.}
+\newblock {evd: Extreme Value Distributions}.
+\newblock {\em R News}, 2(2):0, June 2002.
+
+\bibitem[{Ste}16]{PACKTideHarmonics}
+{Stephenson, A.G.}
+\newblock {\em {Harmonic Analysis of Tides Using TideHarmonics}}, 2016.
+\newblock {R package version 0.1.0}.
+
+\bibitem[{Tur}13]{PACKquadprog}
+{Turlach A.B. and Weingessel A.}
+\newblock {\em {quadprog: Functions to solve Quadratic Programming Problems}},
+  2013.
+\newblock R package version 1.5-5.
+
+\end{thebibliography}

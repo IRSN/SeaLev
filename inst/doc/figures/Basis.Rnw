@@ -1,0 +1,69 @@
+\documentclass[11pt,a4paper]{article}
+
+% \VignetteIndexEntry{Introduction to SeaLev}
+% \VignetteDepends{SeaLev}
+% \VignetteKeyword{sea level convolution}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage[english]{babel}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{fullpage}
+\usepackage{color}
+
+%%======================================================== 
+\newcommand{\Esp}{\mathbb{E}}
+\newcommand{\Cov}{\textrm{Cov}}
+\newcommand{\Corr}{\textrm{Corr}}
+\newcommand{\Var}{\textrm{Var}}
+\newcommand{\m}{\mathbf}   
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\pCond}[2]{\left( #1 \;\middle\vert\; #2 \right)}
+\newcommand{\bCond}[2]{\left[ #1 \;\middle\vert\; #2 \right]}
+\newcommand{\Cond}[2]{\left. #1 \;\middle\vert\; #2 \right.}
+\newcommand{\Low}[1]{#1_{\mathrm{min}}}
+\newcommand{\Up}[1]{#1_{\mathrm{max}}}
+%%========================================================= 
+\definecolor{InputColor}{rgb}{0.600,0.060,0.360} 
+\definecolor{OutputColor}{rgb}{0.133,0.543,0.133}
+\definecolor{Gray}{rgb}{0.5,0.5,0.5}
+%%=========================================================
+\title{B-spline basis}
+
+\author{Yves Deville}
+
+
+\begin{document}
+
+%% first page: copyright only
+\thispagestyle{empty}
+
+<<label="Bspline", dev="tikz", include=FALSE, fig.show="asis", fig.keep="last", fig.width = 6, fig.height = 3.6>>=
+library(SeaLev)
+data(Brest.tide)
+
+library(RColorBrewer)
+myPal <- brewer.pal(name = "RdYlGn", n = 10) 
+SD10 <- SplineDensity(x = Brest.tide$x, f = Brest.tide$y, nKnots = 10)
+
+matplot(x = SD10$x, y = SD10$B, type = "l", lty = 1,
+        col = myPal, lwd = 2, bty = "n",
+        xlab = "", ylab = "", xaxt = "n", yaxt = "n")
+
+abline(v = c(SD10$xmin, SD10$xmax), col = "gray")
+       
+tli <- 0.3
+mtext("$x_{\\min}$", side = 1, line = tli, at = SD10$xmin)
+mtext("$x_{\\max}$", side = 1, line = tli, at = SD10$xmax)
+i <- 7
+lines(x = SD10$x, y = SD10$B[ , i + 1], lwd = 3, lty = 3)
+
+points(x =  SD10$knots, 
+       y = rep(0, length(SD10$knots)), 
+       pch = 21, lwd = 2, col = "black", bg = "white")
+       
+mtext("$\\zeta_i$", side = 1, line = tli, at = SD10$knots[i + 1])
+mtext("$\\zeta_{i + k}$", side = 1, line = tli, at = SD10$knots[i + 5])
+text("$B_i(x)$", x = SD10$knots[i + 3], y = 0.76)
+@ 
+
+\end{document}

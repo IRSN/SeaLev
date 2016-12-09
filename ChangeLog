@@ -1,0 +1,127 @@
+2016-03-09  yves  <deville.yves@alpestat.com>
+
+	* Completed many changes in the SeaLevGuide. The .Rnw file must
+	now be compiled with knitr and no longer with Sweave.
+	
+
+2016-03-08  yves  <deville.yves@alpestat.com>
+
+	* Fixed bug in 'convSL' (new version). When computing the finite
+	differences on 'par.y', elements names are lost in 'par.plus[ ,
+	ip]' when 'p.y' is 1. The function 'myFuns$F.y' could then no
+	longer work as it should. Solved with an uggly 'if (p.y > 1L)'.
+
+	* Fixed bug in 'convSL2': 'threshold.y' was not used for
+	quadrature points to shift the result.
+
+	* Fixed bug in 'GPtail': 'threshold.y' was not used as it should.
+
+	* Renamed convSL to 'convSLOld' then 'convSL2' to 'convSL'
+		
+
+2016-03-02  yves  <deville.yves@alpestat.com>
+
+	* Fixed a bug in 'convSL2'. When the distribution had only one
+	parameter, the matrix of gradients of S was turned into a vector
+	due to a missing 'drop = FALSE'.
+
+	
+2016-01-11  yves  <deville.yves@alpestat.com>
+
+	* Changed the default vale of 'N.quad' in 'convSL2', because the
+	default was too small which caused bumpy curves on Return level
+	plots.
+	
+
+2015-11-30  yves  <deville.yves@alpestat.com>
+
+	* Added the GPtail (S3) class and some method. The GPtail creator
+	function computes the convolution of a spline density and a GPD
+	with provided parameters. The computation uses an enterly new
+	formula.
+
+	* Added the SplineDensity (S3) class and some methods.
+
+	* Added the new function convSL2, a new implementation of convSL
+	which should replace it.
+
+	
+2013-07-08  yves  <deville.yves@alpestat.com>
+
+	* Added a NAMESPACE.
+	
+	* Vignette 'SeaLevGuide' was slightly modified. The 'fRenouv'
+	function was replaced in code chunks by 'Renouv' and
+	the covariance of a "Renouv" object is now found using the 'vcov'
+	method. The test function \phi(x, y) received its missing 'y'
+	argument. Some errors concerning english were corrected, e.g.
+	'conditional to' -> 'conditional on'.
+
+	* The .Rbuildignore file was edited in order to ship with the
+	package only the pdf file, the .Rnw code and R code.
+	
+
+2010-11-16  yves  <deville.yves@alpestat.com>
+
+	* RSLplot now has args 'below' and 'alpha.below'. The
+	semi-transparent rectangle is no longer drawn in 'convSL' but in
+	'RSLplot'. This rectangle can partially occult return
+	level/confidence lines yet letting empirical points unaffected.
+
+	* Typos found by Lise Bardet in the Rd files / manual were
+	corrected. Howevet the formal 'pct.conf' of convSL was not renamed
+	to math the names of Renext, since Renext formals names might be
+	changed in the future.
+	
+	* Vignette was slightly modified. The names of Pugh and Vassie is
+	cited at the begining. The example with empirical points was
+	slightly modified.
+
+	
+2010-11-04  yves  <deville.yves@alpestat.com>
+
+	* RSLplot now supports the plotting of experimental points
+	given through 'z' and 'duration' formals.
+
+	* convSL has an 'alpha.below' formal allowing the user to "gray"
+	or partially occult the region below HAT+threshold on the return
+	level plot.
+
+	* Rd files were corrected. Note that the use of references in
+	french lead to using the \enc{}{} macro and the \encoding{UTF-8}
+	section. The manual is generated using Rd2dvi with with an
+	'--encoding=utf8' option, but it seems to works fine without it.
+	
+	* Vignette was corrected. The plotting of experimental points
+	is described (how return periods are computed) and illustrated
+	with examples.
+
+	
+2010-09-17  yves  <deville.yves@alpestat.com>
+
+	* convSL allows the superposition of an asymptotic return
+	level curve for exponential and GPD POT distributions,
+	only for postitive shape in the GPD case.
+	The exponential case provides a validation for the convolution
+	comptation, since the asymptotic curve is exact for return levels
+	> threshold.y + xmax (see Vignette) and is computed independently
+	from the convolution.
+
+	* convSL arguments names percents for confidence bands are now
+	given in 'pct.conf'. The threshold. in 'threshold.y' an now be set
+	to 'NA' in which case the distribution of Y is for the surge
+	itself rather than the surge exceedance Y-u. This allows the use
+	of GEV distribution as in B. Simon's Book. Graphical parameters
+	are passed to 'RSLplot' (e.g. 'Tlim' and 'problim') or to plot
+	('main', 'ylim').
+	
+	* RSLplot Arguments of the 'RSLplot' function are changed.  The
+	args concerning confidence bands are named ***.conf.  Two new ars
+	'Tlim' and 'problim' allow the user to set the x axis limits in
+	periods (years) or probability.  The default values have been
+	changed to cover larger ranges. It is possible to use filled
+	confidence regions, to set the color and line type of these.
+
+	
+	
+

@@ -1,0 +1,66 @@
+\indexentry{warning|hyperpage}{1}
+\indexentry{skew surge|hyperpage}{1}
+\indexentry{rate, sampling for high tides|hyperpage}{1}
+\indexentry{convolution!formula|hyperpage}{2}
+\indexentry{non-parametric density|hyperpage}{2}
+\indexentry{HAT (Highest Astronomical Tide)|hyperpage}{2}
+\indexentry{POT (Peak Over the Threshold)|hyperpage}{3}
+\indexentry{GPD (Generalised Pareto Distribution)|hyperpage}{3}
+\indexentry{GEV (Generalised Extreme Value)|hyperpage}{3}
+\indexentry{ergodicity|hyperpage}{3}
+\indexentry{rate, sampling for high tides|hyperpage}{4}
+\indexentry{delta method|hyperpage}{5}
+\indexentry{conditional distribution of the tide|hyperpage}{6}
+\indexentry{return level plot|hyperpage}{6}
+\indexentry{experimental points|hyperpage}{7}
+\indexentry{plotting positions|hyperpage}{7}
+\indexentry{r largest@{$r$ largest}|hyperpage}{7}
+\indexentry{exponential distribution|(hyperpage}{8}
+\indexentry{cumulants (generating function of)|hyperpage}{8}
+\indexentry{exponential distribution|)hyperpage}{8}
+\indexentry{GPD (Generalised Pareto Distribution)|(hyperpage}{8}
+\indexentry{tail-equivalent|hyperpage}{8}
+\indexentry{GEV (Generalised Extreme Value)|hyperpage}{8}
+\indexentry{GPD (Generalised Pareto Distribution)|)hyperpage}{8}
+\indexentry{rate, sampling for high tides|hyperpage}{10}
+\indexentry{skew surge|hyperpage}{10}
+\indexentry{return level plot|hyperpage}{10}
+\indexentry{POT (Peak Over the Threshold)|hyperpage}{10}
+\indexentry{delta method|hyperpage}{12}
+\indexentry{confidence bands!filled|hyperpage}{12}
+\indexentry{confidence bands!percentage|hyperpage}{12}
+\indexentry{Gumbel distribution|hyperpage}{12}
+\indexentry{GEV (Generalised Extreme Value)|hyperpage}{12}
+\indexentry{prediction|hyperpage}{15}
+\indexentry{axes, controlling the range|hyperpage}{15}
+\indexentry{experimental points|hyperpage}{15}
+\indexentry{plotting positions|hyperpage}{15}
+\indexentry{spline density|(hyperpage}{18}
+\indexentry{SplineDensity@{\texttt{SplineDensity}}|hyperindexformat{\see{spline density}}}{18}
+\indexentry{GPtail@{\texttt{GPtail}}|hyperindexformat{\see{spline density}}}{18}
+\indexentry{plot method@{\texttt{plot} method}|hyperpage}{18}
+\indexentry{plot method@{\texttt{predict} method}|hyperpage}{18}
+\indexentry{plot method@{\texttt{plot} method}|hyperpage}{18}
+\indexentry{grid density|hyperpage}{18}
+\indexentry{knots (spline)|hyperpage}{19}
+\indexentry{warning|hyperpage}{19}
+\indexentry{constraint!normalisation|hyperpage}{19}
+\indexentry{constraint!positivity|hyperpage}{19}
+\indexentry{plot method@{\texttt{plot} method}|hyperpage}{20}
+\indexentry{tail-equivalent|hyperpage}{20}
+\indexentry{predict method@{\texttt{predict} method}|hyperpage}{20}
+\indexentry{cumulants (generating function of)|hyperpage}{20}
+\indexentry{spline density|)hyperpage}{22}
+\indexentry{convolution!discrete|hyperpage}{25}
+\indexentry{convolution!algorithm|hyperpage}{27}
+\indexentry{spline density|(hyperpage}{28}
+\indexentry{knots (spline)|hyperpage}{28}
+\indexentry{constraint!equality|hyperpage}{29}
+\indexentry{constraint!normalisation|hyperpage}{29}
+\indexentry{grid density|hyperpage}{29}
+\indexentry{delta method|hyperpage}{30}
+\indexentry{bulk of a distribution|hyperpage}{30}
+\indexentry{spline density|)hyperpage}{30}
+\indexentry{exponential distribution|(hyperpage}{31}
+\indexentry{exponential distribution|)hyperpage}{31}
+\indexentry{GPD (Generalised Pareto Distribution)|hyperpage}{31}

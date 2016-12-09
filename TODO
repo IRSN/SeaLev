@@ -1,0 +1,40 @@
+
+             *************************************
+
+                      TO DO LIST (ideas)
+
+             *************************************
+
+ o [X] Add a NAMESPACE file.	     
+
+ o Add a S3 simulation method for the classes "SplineDensity" and
+   "GPtail". This could rely simply on an approximation of the
+   distribution function as a broken line, and on a 'simulate' method
+   written for lists (intended to have 'x' and 'y' elements) see next
+   point. For instance, simulate(object = Brest.tide, nsim = 100) draws
+   100 astronomical tides for Brest.
+
+ o Define a (S3 or S4) class for distributions with bounded support
+   and density given as a continuous broken line, as is the density of
+   High Tide Astronomical levels.  Methods would be: 'plot' (with
+   filled region undex the curve), 'range' 'max', 'min'... Also
+   'simulate' could be used to draw samples from tide that could be
+   combined with surges (either empirical or simulated).
+
+ o Implement Bayesian inference with MCMC results on input. 
+   For large return periods, the quadratures can be costly 
+   to compute, so a restriction to the spline tidal density 
+   could be preferred, with C code for speed requirements.   
+
+ o Allow the use of mixed distribution for surges with a 
+   semi-parametric density estimation below a threshold u and
+   say, a GPD tail above. Such distributions were 
+   described by Dixon and Tawn. They would allow a predictions
+   for low or moderate return periods (1 to 100 years) as 
+   well as extremes (100 to 1000 or more years).
+   This distributions could be registrated as a class with
+   specific methods 'thresold', etc.
+ 
+ o Allow the use of a list to group several formals of the 
+   same family for graphic purposes. E.g. lty.conf, col.conf, 
+   etc. could be replaced by a list with elements lty, col, etc.

@@ -1,0 +1,197 @@
+\name{convSL2}
+\alias{convSL2}
+\title{
+
+  Convolution for Sea Levels: tide and surge
+
+}
+\usage{
+convSL2(dens.x,
+        shift.x = 0,
+        threshold.y = NA,
+        distname.y = "exponential",
+        shift.y = ifelse(is.na(threshold.y), 0, threshold.y),
+        par.y = c(rate = 0.1),
+        covpar.y = NULL,
+        lambda = ifelse(is.na(threshold.y), 705.8, NA),
+        pct.conf = c(95, 70),
+        use.covlambda = "lambda" \%in\% colnames(covpar.y),
+        prob = NULL,
+        prob.max = ifelse(is.na(threshold.y), 1 - 1e-08, 1 - 1e-05),
+        pred.period = NULL,
+        N = 2048,
+        N.quad = NULL,
+        Tlim = c(1, 1e+05),
+        deriv = TRUE,
+        plot = TRUE,
+        show.x = TRUE,
+        show.asympt = TRUE,
+        alpha.below = 0.5,
+        trace = 0,
+        ...)
+}
+\arguments{
+  \item{dens.x}{
+
+    See \code{\link{convSL}}.
+
+  }
+  \item{shift.x}{See \code{\link{convSL}}.}
+  \item{threshold.y}{See \code{\link{convSL}}.}
+  
+  \item{distname.y}{See \code{\link{convSL}}.}
+  
+  \item{shift.y}{See \code{\link{convSL}}.}
+  
+  \item{par.y}{See \code{\link{convSL}}.}
+  
+  \item{covpar.y}{See \code{\link{convSL}}.}
+  
+  \item{lambda}{See \code{\link{convSL}}.}
+  
+  \item{pct.conf}{See \code{\link{convSL}}.}
+  
+  \item{use.covlambda}{See \code{\link{convSL}}.}
+  
+  \item{prob}{See \code{\link{convSL}}.}
+  
+  \item{prob.max}{See \code{\link{convSL}}.}
+  
+  \item{pred.period}{See \code{\link{convSL}}.}
+  
+  \item{N}{See \code{\link{convSL}}.}
+  
+  \item{N.quad}{
+    
+    Number of (large) values \eqn{z} of the r.v. \eqn{Z} for which a
+    numerical quadrature will be used.
+    
+  }
+  
+  \item{Tlim}{
+    
+    Numeric vector of length 2 giving the limits for the return periods.
+    
+  }
+  
+  \item{deriv}{
+    
+    Logical. If \code{TRUE}, the derivative (w.r.t. parameters) of the
+    survival and the return level are computed and returned.
+    
+  }
+  
+  \item{plot}{See \code{\link{convSL}}.}
+  
+  \item{show.x}{See \code{\link{convSL}}.}
+  
+  \item{show.asympt}{See \code{\link{convSL}}.}
+  
+  \item{alpha.below}{See \code{\link{convSL}}.}
+  
+  \item{trace}{See \code{\link{convSL}}.}
+  
+  \item{...}{See \code{\link{convSL}}.}
+  
+}
+\value{
+
+  A list similar to that returned by \code{\link{convSL}}.
+
+}
+\description{
+
+  Computes the distribution and return levels for sea levels from the
+  two parts 'tidal' and 'surge' using a mixed method involving
+  discrete convolution and quadratures.
+  
+}
+\details{
+
+  This function performs essentially the same thing as
+  \code{\link{convSL}}, but the numerical precision has been improved by
+  limiting the use of a discrete convolution to a restricted range of
+  values. The evaluation of the convolution tail is obtained by using
+  numerical quadratures for each of the tail value. The improvements are
+  for the case where the distribution of \eqn{Y} is heavy-tailed and where
+  large return periods are considered, say > 1000 years.
+  
+  This function should replace the \code{\link{convSL}} function in
+  a future version of the package.
+
+}
+\note{
+
+  Slight changes have been made in the formal arguments list:
+  \code{N.quad}, \code{Tlim} and \code{deriv} are new formals while
+  the technical parameter \code{plim.y} was removed.
+
+  The asymptotic approximation shown for a GPD distribution (when 
+  \code{show.asympt = TRUE} is used) different from the one in
+  \code{\link{convSL}}. The shift between the GPD tails for \eqn{Z}
+  and \eqn{X} is now taken as \eqn{\sigma_Y K_X(1/\sigma_Y)} where
+  \eqn{K_X} is the generating function of the cumulants and \eqn{\sigma_Y}
+  is the scale parameter for the GP distribution of \eqn{Y}. The value
+  used in \code{\link{convSL}} is the expectation \eqn{E[X]}.
+
+}
+\examples{
+data(Brest.tide)
+SD <- SplineDensity(x = Brest.tide$x, f = Brest.tide$y,
+                    order = 2, nKnots = 24)
+
+## use a simulated sample to get a possible covariance matrix
+## (along with the estimated coefficients).
+n <- 400
+set.seed(123)
+par.y0 <- c("scale" = rgamma(1, shape = 2, scale = 30),
+            "shape" = 0.1 + 0.2 * runif(1))
+par.y0 <- c("scale" = 58, "shape" = 0.28)
+Y <- rGPD(n, scale = par.y0["scale"], shape = par.y0["shape"])
+fit <- Renouv(x = Y, threshold = 0, effDuration = n,
+              distname.y = "GPD", plot = FALSE)
+par.y <- coef(fit)[c("scale", "shape")]
+covpar.y <- vcov(fit)
+lambda <- coef(fit)["lambda"]
+
+## use the convSL function first
+dev.set(2)
+res1 <- convSL(dens.x = Brest.tide, distname.y = "GPD",
+               covpar.y = covpar.y, lambda = lambda,
+               N = 8 * 1024, par.y = par.y, plot = FALSE)
+Tmax <- 100000
+RSLplot(data = subset(res1$ret.lev, period <= Tmax),
+        lambda = 1, main = "old")
+
+## use the convSL2 function
+if (length(dev.list()) < 2) dev.new()
+dev.set(3)
+res2 <- convSL2(dens.x = Brest.tide,
+                distname.y = "GPD",
+                covpar.y = covpar.y,
+                lambda = lambda,
+                N = 2 * 1024,
+                par.y = par.y,
+                plot = FALSE)
+
+RSLplot(data = subset(res2$ret.lev, period <= Tmax),
+        lambda = 1,
+        main = sprintf("new, scale = \%5.2f shape = \%5.2f",
+                       par.y["scale"], par.y["shape"]))
+
+## the GPtail function can be used for comparisons.
+res3 <- GPtail(x = SD,
+               par.y = par.y,
+               lambda = lambda,
+               covpar.y = covpar.y,
+               N = 2 * 1014)
+
+cbind(subset(res1$ret.lev, subset = (period <= Tmax),
+             select = c("period", "quant")),
+      subset(res2$ret.lev, subset = (period <= Tmax),
+             select = c("period", "quant")))
+}
+\author{
+Yves Deville
+}
+
