@@ -10,6 +10,29 @@ print.GPtail <- function(x, ...) {
     print(x$par.y)
 }
 
+
+varnames <- function(object, ...) {
+    UseMethod("varnames")
+}
+
+varnames.GPtail <- function(object, ...) {
+    object$varnames
+}
+
+`varnames<-` <-  function(object, ..., value) {
+    UseMethod("varnames<-")
+}
+
+`varnames<-.GPtail` <-  function(object, ..., value) {
+    if (length(value) != 3L) {
+        stop("'value' must be of length 3")
+    }
+    names(value) <- c("x", "y", "z")
+    object$varnames <- as.character(value)
+    object
+}
+
+
 ##' Plot method for the \code{"GPtail"} class.
 ##'
 ##' @title Plot method for the \code{"GPtail"} class
@@ -37,18 +60,32 @@ print.GPtail <- function(x, ...) {
 plot.GPtail <- function(x, y = NULL, which = 1, ...) {
 
     fill <- TRUE
+    vn <- varnames(x)
     
+    ## ========================================================================
+    ## Plot the densities
+    ## ========================================================================
     if (which == 1) {
+
+        if (max(sapply(vn, nchar)) < 4L) {
+            labs <- paste("density of", vn, sep = " ")
+        } else {
+            labs <- vn
+        }
+        
+        main <- sprintf("GPD param. for %s: sigma = %6.2f, xi = %6.2f",
+                        vn[2], x$par.y["scale"], x$par.y["shape"])
         
         coll <- translude("gray", alpha = 0.9)
         
         opar <- par(mfrow = c(3, 1))
+        on.exit(par(opar))
+        
         par(mar = c(1.4, 4, 3, 3))
         
         plot(x$dens.x, type = "l", lwd = 2,
-             main = sprintf("sigma_Y = %6.2f, xi_Y = %6.2f",
-                 x$par.y["scale"], x$par.y["shape"]),
-             ylab = "density of X", xlab = "",
+             main = main,
+             ylab = labs[1], xlab = "",
              col = "orangered", xlim = range(x$z))
 
         if (fill) {
@@ -62,8 +99,9 @@ plot.GPtail <- function(x, y = NULL, which = 1, ...) {
         
         par(mar = c(1.4, 4, 1, 3))
         plot(x$dens.y, type = "l", col = "SteelBlue3", lwd = 2,
-             ylab = "density of Y", xlab = "")
+             ylab = labs[2], xlab = "")
         abline(h = 0, col = coll)
+        
         if (fill) {
             ly <- length(x$dens.y$x)
             polygon(x = c(x$dens.y$x[1], x$dens.y$x, x$dens.y$x[ly], x$dens.y$x[ly]),
@@ -72,10 +110,12 @@ plot.GPtail <- function(x, y = NULL, which = 1, ...) {
         }
         
         par(mar = c(3, 4, 1, 3))
+      
         plot(x$dens.z, type = "l",
-             ylab = "density of Z", xlab = "",
+             ylab = labs[3], xlab = "",
              col = "SpringGreen3", lwd = 2)
         abline(h = 0, v = x$SD.x$xmax, col = coll)
+        
         if (fill) {
             lz <- length(x$dens.z$x)
             polygon(x = c(x$dens.z$x[1], x$dens.z$x, x$dens.z$x[lz], x$dens.z$x[lz]),
@@ -83,22 +123,28 @@ plot.GPtail <- function(x, y = NULL, which = 1, ...) {
                     col = translude("SpringGreen3", alpha = 0.5))
         }
 
-        par(opar)
+        ## par(opar)
 
     } else if (which == 2) {
+  
         coll <- translude("gray", alpha = 0.9)
+
+        main <- sprintf("GPD param. for %s: sigma = %6.2f, xi = %6.2f",
+                        vn[2], x$par.y["scale"], x$par.y["shape"])
+        
         plot(x$dist.z, type = "l",
-             main = sprintf("sigma_Y = %6.2f, xi_Y = %6.2f",
-                 x$par.y["scale"], x$par.y["shape"]),
+             main = main,
              col = "SpringGreen3", lwd = 2, ylim = c(0, 1),
-             xlab = "z", ylab = "cdf of Z")
+             xlab = vn[3], ylab = "cdf of Z")
+        
         abline(h = c(0.0, 1.0), v = x$SD.x$xmax, col = coll)
+
     }  else if (which == 3) {
+        
         RSLplot(data = x$ret.lev, lambda = x$lambda)
+
     }
     
-    
-
-
+   
     
 }

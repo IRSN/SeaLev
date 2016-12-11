@@ -1,3 +1,7 @@
+2016-12-11  yves  <deville.yves@alpestat.com>
+
+	* Added `varnames` and `varnames<-` S3 methods for "GPtail".
+
 2016-03-09  yves  <deville.yves@alpestat.com>
 
 	* Completed many changes in the SeaLevGuide. The .Rnw file must

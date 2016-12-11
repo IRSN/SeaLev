@@ -15,6 +15,7 @@ GPtail(x,
        covpar.y = NULL,
        lambda = ifelse(is.na(threshold.y), 705.8, NA),
        shift.y = ifelse(is.na(threshold.y), 0, threshold.y),
+       varnames = c(x = "X", y = "Y", z = "Z"),
        pct.conf = c(95, 70),
        use.covlambda = "lambda" \%in\% colnames(covpar.y),
        deriv = !is.null(covpar.y),
@@ -65,6 +66,12 @@ GPtail(x,
     given in \emph{events by year} since the return levels are given on
     a yearly basis.
 
+  }
+  \item{varnames}{
+
+    Names for the three variables, with distribution: spline density, GP
+    and convolution. 
+    
   }
   \item{shift.y}{
  
@@ -175,12 +182,14 @@ par.y <- c("scale" = rgamma(1, shape = 2, scale = 30),
            "shape" = 0.2 * runif(1))
 res <- GPtail(x = SD, par.y = par.y, lambda = 1)
 
+## change variable names
+varnames(res) <- c(x = "Tide", y = "Skew surge", z = "Sea level")
+
 ## plot the densities
 plot(res)
 
 ## plot the return level
 plot(res, which = 3)
-
 }
 
 \author{

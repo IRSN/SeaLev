@@ -9,7 +9,8 @@ importFrom("grDevices", "col2rgb", "rgb")
 export(convSL, convSLOld,
        RSLplot,
        SplineDensity, rSplineDensity, momGen,
-       GPtail)
+       GPtail,
+       varnames, "varnames<-")
               
 ## methods for the S3 class "SplineDensity"
 S3method(plot, "SplineDensity")
@@ -20,3 +21,5 @@ S3method(summary, "SplineDensity")
 ## methods for the S3 class "GPtail"
 S3method(plot, "GPtail")
 S3method(print, "GPtail")
+S3method(varnames, "GPtail")
+S3method("varnames<-", "GPtail")

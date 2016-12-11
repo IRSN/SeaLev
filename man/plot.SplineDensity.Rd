@@ -4,7 +4,7 @@
 \alias{plot.SplineDensity}
 \title{
 
-  Plot method for \code{SplineDensity} objects
+  Plot method for \code{"SplineDensity"} class
 
 }
 \usage{

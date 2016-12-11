@@ -34,7 +34,9 @@
 ##' levels. Should be given in \emph{events by year} since the return
 ##' levels are given on a yearly basis.
 ##'
-##' @param shift.y
+##' @param shift.y A poss
+##'
+##' @param varnames 
 ##' 
 ##' @param pct.conf Confidence levels in percent. Should be given in
 ##' decreasing order.
@@ -86,7 +88,6 @@
 ##'            "shape" = 0.2 * runif(1))
 ##' res <- GPtail(x = SD.Brest, par.y = par.y, lambda = 1)
 ##' 
-
 GPtail <- function(x,
                    threshold.y = NA,
                    distname.y = "GPD",
@@ -94,6 +95,7 @@ GPtail <- function(x,
                    covpar.y = NULL,
                    lambda = ifelse(is.na(threshold.y), 705.8, NA),
                    shift.y = ifelse(is.na(threshold.y), 0, threshold.y),
+                   varnames = c(x = "X", y = "Y", z = "Z"),
                    pct.conf = c(95, 70),
                    use.covlambda = "lambda" %in% colnames(covpar.y),
                    deriv = !is.null(covpar.y),
@@ -660,48 +662,49 @@ GPtail <- function(x,
     ## plot if needed
     ##====================================================================
 
-    if (plot.which) {
+    ## if (FALSE && plot.which) {
         
-        if (plot.which == 1) {
+    ##     if (plot.which == 1) {
             
-            coll <- translude("gray", alpha = 0.9)
+    ##         coll <- translude("gray", alpha = 0.9)
             
-            opar <- par(mfrow = c(3, 1))
-            par(mar = c(1, 4, 3, 3))
+    ##         opar <- par(mfrow = c(3, 1))
+    ##         par(mar = c(1, 4, 3, 3))
             
-            plot(xg, fxg, type = "l", lwd = 2,
-                 main = sprintf("sigma_Y = %6.2f, xi_Y = %6.2f",
-                     par.y["scale"], par.y["shape"]),
-                 col = "orangered", xlim = c(zmin, max(zg)))
-            abline(h = 0, v = xmax, col = coll)
-            par(mar = c(1, 4, 1, 3))
-            plot(yg, fyg, type = "l", col = "SteelBlue3", lwd = 2)
-            abline(h = 0, col = coll)
-            par(mar = c(3, 4, 1, 3))
-            plot(zg, fzg, xlim = c(zmin, max(zg)), type = "l",
-                 col = "SpringGreen3", lwd = 2)
-            abline(h = 0, v = xmax, col = coll)
+    ##         plot(xg, fxg, type = "l", lwd = 2,
+    ##              main = sprintf("sigma_Y = %6.2f, xi_Y = %6.2f",
+    ##                  par.y["scale"], par.y["shape"]),
+    ##              col = "orangered", xlim = c(zmin, max(zg)))
+    ##         abline(h = 0, v = xmax, col = coll)
+    ##         par(mar = c(1, 4, 1, 3))
+    ##         plot(yg, fyg, type = "l", col = "SteelBlue3", lwd = 2)
+    ##         abline(h = 0, col = coll)
+    ##         par(mar = c(3, 4, 1, 3))
+    ##         plot(zg, fzg, xlim = c(zmin, max(zg)), type = "l",
+    ##              col = "SpringGreen3", lwd = 2)
+    ##         abline(h = 0, v = xmax, col = coll)
             
-            par(opar)
+    ##         par(opar)
             
-        } else if  (plot.which == 2) {
-            coll <- translude("gray", alpha = 0.9)
-            plot(zg, Szg, xlim = c(zmin, max(zg)), type = "l",
-                 main = sprintf("sigma_Y = %6.2f, xi_Y = %6.2f",
-                     par.y["scale"], par.y["shape"]),
-                 col = "SpringGreen3", lwd = 2, ylim = c(0, 1))
-            lines(zg.ex, Szg.ex, type = "l", lty = "dashed", lwd = 2)
-            abline(h = 0, v = xmax, col = coll)
-        } else if  (plot.which == 3) {
-            RSLplot(data = x$ret.lev, lambda = x$lambda)
-        }
+    ##     } else if  (plot.which == 2) {
+    ##         coll <- translude("gray", alpha = 0.9)
+    ##         plot(zg, Szg, xlim = c(zmin, max(zg)), type = "l",
+    ##              main = sprintf("sigma_Y = %6.2f, xi_Y = %6.2f",
+    ##                  par.y["scale"], par.y["shape"]),
+    ##              col = "SpringGreen3", lwd = 2, ylim = c(0, 1))
+    ##         lines(zg.ex, Szg.ex, type = "l", lty = "dashed", lwd = 2)
+    ##         abline(h = 0, v = xmax, col = coll)
+    ##     } else if  (plot.which == 3) {
+    ##         RSLplot(data = x$ret.lev, lambda = x$lambda)
+    ##     }
 
-    }
+    ## }
         
     res <- list(call = mc,
                 lambda = lambda,
                 threshold.y = threshold.y,
                 shift.y = shift.y,
+                varnames = varnames,
                 SD.x = x,
                 par.y = par.y,
                 x = xg,
@@ -727,6 +730,12 @@ GPtail <- function(x,
                 pred = as.data.frame(pred))
     
     class(res) <- "GPtail"
+
+    if (plot.which) {
+        plot(res, which = which)
+    }
+
+    
     res
     
 }
