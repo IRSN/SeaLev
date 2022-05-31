@@ -1073,18 +1073,24 @@ head(conv.gpd2$pred, n = 3)
 @ 
 
 \noindent
-Each row correspond to a given period $T$, e.g. $T=100$ years, and
-give the corresponding probability of non-exceedance $p(T)$ (column
-\verb@prob@), the corresponding return level $z(T)$ (column
-\verb@quant@) as well as confidence limits for $z(T)$, here $70$~pct
-and $95$~pct.  It is possible to specify the wanted periods by using
-the \verb@pred.period@ formal of \verb@Renouv@.
+Each row correspond to a given period $T$, e.g.
+$T=100$ years, and gives the corresponding return level
+$z(T)$ (column \verb@quant@) as well as confidence limits for
+$z(T)$, here $95\,\%$ and
+$90\,\%$.  It is possible to specify the wanted periods by using the
+\verb@pred.period@ formal of \verb@Renouv@. The column \verb@prob@ gives the
+probability of non-exceedance
+$p(T)$ \textit{for an event}, not for an annual maxima. For instance, a
+non-exceedance probability $p =
+0.99$ corresponds to a level which on average is exceeded once in
+$100$ \textit{events}, hence once in $100 / \lambda \approx \Sexpr{round(100 /
+  lambda, digits = 1)}$ years.
 
 
-Recall that $z(T)$ and $p(T)$ are connected to each other by $z =
-1/[\widehat{\lambda} \times (1-p)]$, thus the relation between $T$ and
-$p$ is affected by the uncertainty on the estimation of
-$\lambda$. However, this uncertainty is small for large periods.
+Recall that $z(T) = q_Z(1 - 1 /T)$ with
+$T = 1/[\widehat{\lambda} \times (1-p)]$, thus uncertainty on the estimation of
+$\lambda$ has an impact on the estimation of $z(T)$. However, this uncertainty
+is small for large periods.
 
 \index{prediction}
 Also note that the term ``prediction'' can be misleading. The $100$-years
@@ -1144,6 +1150,17 @@ get the world coordinates or to use the \verb@locator@ function.
      \texttt{ylim} argument of \texttt{plot} was used. Right: the
      \texttt{Tlim} argument of \texttt{RSLplot} chooses the range of
      return periods, here from $100$ to $5000$.}
+ \end{figure}
+ 
+\begin{figure}
+   \centering
+   \begin{tabular}{c c} 
+     \includegraphics[width=7.4cm]{Rgraphics/figempirical-1.pdf} &
+     \includegraphics[width=7.4cm]{Rgraphics/figempirical1-1.pdf} 
+   \end{tabular}
+   \caption{\label{Empirical} Adding empirical points to the return level
+     plot using \texttt{z} and \texttt{duration}. When several sets are used,
+     \texttt{z} must be a list of numeric vectors.}
 \end{figure}
 
 In order to add experimental points to the plot, the two formal
@@ -1152,7 +1169,7 @@ arguments \index{experimental points}\index{plotting positions}
 the simplest case, \verb@z@ is a numeric vector and \verb@duration@ is
 a positive numeric value representing a duration in years. 
 \label{EMPPOINTS} For instance, with meaningless points and in 
-a purely illustrative purpose we get the plots of figure~\ref{empirical}.
+a purely illustrative purpose we get the plots of figure~\ref{Empirical}.
 
 <<empirical, fig.show="hide", fig.keep="all", warning=FALSE>>=
 res.g2 <- convSL(dens.x = Brest.tide,
@@ -1183,17 +1200,6 @@ res.g3 <- convSL(dens.x = Brest.tide,
 Some properties of the points such as the colour can be changed by passing
 suitable arguments to the \verb@RLSplot@ function, with names \verb@.points@.
 For instance, a vector of colours can be specified with \verb@col.points@.
-
-\begin{figure}
-   \centering
-   \begin{tabular}{c c} 
-     \includegraphics[width=7.4cm]{Rgraphics/figempirical-1.pdf} &
-     \includegraphics[width=7.4cm]{Rgraphics/figempirical1-1.pdf} 
-   \end{tabular}
-   \caption{\label{empirical} Adding empirical points to the return level
-     plot using \texttt{z} and \texttt{duration}. When several sets are used,
-     \texttt{z} must be a list of numeric vectors.}
-\end{figure}
 
 \chapter{Spline density for the tide}
 %%==============================================

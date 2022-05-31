@@ -1,8 +1,8 @@
 Package: SeaLev
 Type: Package
 Title: Convolution Method for Sea Levels
-Version: 0.4-3
-Date: 2016-12-12
+Version: 0.4-4
+Date: 2022-05-31
 Author: IRSN and Yves Deville
 Maintainer: Yves Deville <deville.yves@alpestat.com>
 Description: Analysis of Sea Levels using Convolution between Tide and Surge.
