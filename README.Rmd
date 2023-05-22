@@ -1,0 +1,103 @@
+---
+title: "README"
+author: "Yves Deville"
+date: "2023-05-22"
+output: github_document
+---
+
+
+
+# The SeaLev package
+
+The **SeaLev** package is a R package funded by IRSN/Behrig. It is
+devoted to the distribution of a Sea Level random variable (r.v.) say
+$Z$ viewed as the sum of two independent r.vs $X$ and $Y$ representing
+the astronomical tide and the surge. More precisely the r.vs relate to
+a *tide interval* defined as the time interval separating two
+consecutive astronomical low tides. Then $X$ is the astronomical
+*high-tide* level and $Y$ is the so-called *skew surge* representing
+the difference between the observed highest level and the astronomical
+high tide level. 
+
+- The distribution of $X$ can be regarded a perfectly known. More
+  precisely, the support of $X$ is an interval $[x_{\texttt{min}}, \,
+  x_{\texttt{max}}]$ where both end-points are finite and known, and 
+  $X$ admits a continuous known density $f_X(x)$ on this interval. 
+
+- By fitting a Peaks Over Threshold (POT) model from observed skew
+  surges $Y_i$ one can regard the tail distribution of $Y$ as that of
+  a Generalized Pareto Distribution (GPD). 
+
+Then the tail distribution of $Z$ can be computed by convolution. 
+
+Mind that this package is quite old since it was created during the
+pre-RStudio era.
+
+# INSTALLATION
+
+## Using the *remotes* package
+
+In an R session use
+
+```{r, eval=FALSE}
+library(remotes)
+install_github("IRSN/SeaLev", dependencies = TRUE, token = myToken)
+```
+
+where `myToken` is *your* GitHub token. This should install the
+package and make it ready to use.
+
+Mind that by default this does not build the vignette shipped with the
+package (long-form documentation). To build the vignette, use instead
+
+```{r, eval=FALSE}
+install_github("IRSN/SeaLev", dependencies = TRUE, token = myToken, build_vignettes = TRUE)
+```
+The installation will then take a longer time but the vignette will be
+accessible from the help of the package (link above the "Help Pages"
+section).
+
+You can also select a specific branch or a specific commit by using
+the suitable syntax for `install_github`. For instance to install the
+branch `develop` use
+
+```{r, eval=FALSE}
+install_github("IRSN/SeaLev@develop", dependencies = TRUE)
+```
+See the **remotes** package documentation for more details.
+
+## Clone, build and install
+
+### Cloning the repository
+
+You can also clone the repository to install the package.  If you do
+not have yet a local `SeaLev` repository, use `git clone` to clone the
+`SeaLev` repository
+
+``` bash
+git clone https://github.com/IRSN/SeaLev
+```
+
+This will create a `SeaLev` sub-directory of the current directory,
+i.e. the directory from which the git command was issued. Of course
+this can work only if you have the authorisation to clone.
+
+### Installation
+
+Move to the parent directory of your cloned repository and use the
+following command from a terminal to create a tarball source file
+
+``` bash
+R CMD build SeaLev
+```
+This will produce a source tarball `SeaLev_x.y.z` where `x`, `y` and
+`z` stand for the major, minor and patch version numbers. Then you can
+install from a command line
+
+``` bash
+R CMD INSTALL SeaLev_x.y.z
+```
+Note that you must also have all the packages required by **SeaLev**
+installed.
+
+You can also use the **RStudio** IDE to install the package.
