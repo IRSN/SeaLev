@@ -37,7 +37,7 @@ In an R session use
 
 ``` r
 library(remotes)
-install_github("IRSN/SeaLev", dependencies = TRUE, token = myToken)
+install_github("IRSN/SeaLev", dependencies = TRUE, auth_token = myToken)
 ```
 
 where `myToken` is *your* GitHub token. This should install the package
@@ -47,7 +47,7 @@ Mind that by default this does not build the vignette shipped with the
 package (long-form documentation). To build the vignette, use instead
 
 ``` r
-install_github("IRSN/SeaLev", dependencies = TRUE, token = myToken, build_vignettes = TRUE)
+install_github("IRSN/SeaLev", dependencies = TRUE, auth_token = myToken, build_vignettes = TRUE)
 ```
 
 The installation will then take a longer time but the vignette will be
