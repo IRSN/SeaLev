@@ -1,23 +1,22 @@
 ---
-title: "README"
+title: "R Package SeaLev"
 author: "Yves Deville"
 date: "2023-05-22"
 output: github_document
 ---
 
 
-
-# The SeaLev package
+# Scope
 
 The **SeaLev** package is a R package funded by IRSN/Behrig. It is
 devoted to the distribution of a Sea Level random variable (r.v.) say
-$Z$ viewed as the sum of two independent r.vs $X$ and $Y$ representing
-the astronomical tide and the surge. More precisely the r.vs relate to
-a *tide interval* defined as the time interval separating two
-consecutive astronomical low tides. Then $X$ is the astronomical
-*high-tide* level and $Y$ is the so-called *skew surge* representing
-the difference between the observed highest level and the astronomical
-high tide level. 
+$Z$, viewed as the sum of two independent r.vs $X$ and $Y$
+representing the astronomical tide and the surge. More precisely the
+r.vs relate to a *tide interval* defined as the time interval
+separating two consecutive astronomical low tides. Then $X$ is the
+astronomical *high-tide* level and $Y$ is the so-called *skew surge*
+representing the difference between the observed highest level and the
+astronomical high tide level.
 
 - The distribution of $X$ can be regarded a perfectly known. More
   precisely, the support of $X$ is an interval $[x_{\texttt{min}}, \,
@@ -41,17 +40,15 @@ In an R session use
 
 ```{r, eval=FALSE}
 library(remotes)
-install_github("IRSN/SeaLev", dependencies = TRUE, auth_token = myToken)
+install_github("IRSN/SeaLev", dependencies = TRUE)
 ```
-
-where `myToken` is *your* GitHub token. This should install the
-package and make it ready to use.
+This should install the package and make it ready to use.
 
 Mind that by default this does not build the vignette shipped with the
 package (long-form documentation). To build the vignette, use instead
 
 ```{r, eval=FALSE}
-install_github("IRSN/SeaLev", dependencies = TRUE, auth_token = myToken, build_vignettes = TRUE)
+install_github("IRSN/SeaLev", dependencies = TRUE, build_vignettes = TRUE)
 ```
 The installation will then take a longer time but the vignette will be
 accessible from the help of the package (link above the "Help Pages"

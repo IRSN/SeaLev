@@ -1,4 +1,3 @@
-%% -*- fill-column: 80; comment-column: 50; -*-
 \documentclass[11pt,a4paper]{report}
 
 % \VignetteIndexEntry{Introduction to SeaLev}
@@ -193,36 +192,33 @@ RVersion <- R.Version()$version.string
 %%-------------
 \subsection{Goals}
 %%----------------
-\textbf{SeaLev} is an R package~\cite{RMANUAL} dedicated to the
-probability analysis of high Sea Levels using the \textit{Convolution
-  Method} or \textit{Joint Probability Method} (JPM) as described in
-the original articles of Pugh and Vassie~\cite{PUGHVASSIE79} and \cite{PUGHVASSIE80}.
-More information on the context can be found in the books by David
-Pugh~\cite[chap.~8]{PUGHBOOK1}, \cite[chap.~6]{PUGHBOOK2}, or that (in french) of Bernard
-Simon~\cite[chap.~VIII]{SIMON}. 
+\textbf{SeaLev} is an R package~\cite{RMANUAL} dedicated to the probability
+analysis of high Sea Levels using the \textit{Convolution Method} or
+\textit{Joint Probability Method} (JPM) as described in the original articles of
+Pugh and Vassie~\cite{PUGHVASSIE79} and \cite{PUGHVASSIE80}.  More information
+on the context can be found in the books by David
+Pugh~\cite[chap.~8]{PUGHBOOK1}, \cite[chap.~6]{PUGHBOOK2}, or that (in french)
+of Bernard Simon~\cite[chap.~VIII]{SIMON}.
 
 The method concerns a \textit{still water} sea level, and relies on a
-decomposition of it as the sum of a \textit{tide} part, and a
-\textit{non-tidal} part --~or \textit{surge} part. The two components
-are considered as independent random variables, and the probability
-distribution of the sea level can then be computed by
-convolution. Note that the surge part can not be observed by itself
-and is obtained as the difference between the observed level and 
-its tidal prediction. The surge is sometimes called the \textit{tide residual}.
+decomposition of it as the sum of a \textit{tide} part, and a \textit{non-tidal}
+part --~or \textit{surge} part. The two components are considered as independent
+random variables, and the probability distribution of the sea level can then be
+computed by convolution. Note that the surge part can not be observed by itself
+and is obtained as the difference between the observed level and its tidal
+prediction. The surge is sometimes called the \textit{tide residual}.
 
-The assumption of independence between the tide and the surge is best
-supported when the modelled sea level is recorded at or near high
-tide~\cite{COLESBAYES}. The \index{skew surge} \textit{skew surge} is
-computed as minus the difference of the predicted (astronomical) tide
-and the nearest experimented high water. Modelling high tide sea levels
-and skew surges (rather than, say,  hourly levels and surges) is a valuable
-option as far as the interest is on extreme \textit{high} sea
-levels. The time between two successive high tides is about $12$ hours and $26$
-minutes for semi-diurnal tides, corresponding to a sampling rate of
-\index{rate, sampling for high tides}
-about $705.8$ high tides by year. The method of convolution applied
-with Skew Surges is sometimes called the \textit{Skew Surge Joint Probability
-Method} (SSJPM).
+The assumption of independence between the tide and the surge is best supported
+when the modelled sea level is recorded at or near high
+tide~\cite{COLESBAYES}. The \index{skew surge} \textit{skew surge} is computed
+as minus the difference of the predicted (astronomical) tide and the nearest
+experimented high water. Modelling high tide sea levels and skew surges (rather
+than, say, hourly levels and surges) is a valuable option as far as the interest
+is on extreme \textit{high} sea levels. The time between two successive high
+tides is about $12$ hours and $26$ minutes for semi-diurnal tides, corresponding
+to a sampling rate of \index{rate, sampling for high tides} about $705.8$ high
+tides by year. The method of convolution applied with Skew Surges is sometimes
+called the \textit{Skew Surge Joint Probability Method} (SSJPM).
 
 \subsection{Limitations}
 %---------------------
@@ -298,8 +294,8 @@ This condition can be useful in the numerical convolution.
   tides will often be bi-modal.
 
 \item The conditions (\ref{eq:FX0}) are not always fulfilled by an arbitrary
-  periodic oscillation with range $(\Low{x},\,\Up{x})$,
-  see the example in~\cite{PUGHVASSIE80}, p.~975.
+  periodic oscillation with range $(\Low{x},\,\Up{x})$, see the example
+  in~\cite{PUGHVASSIE80}, p.~975.
   
 \item In practice, the distribution of the tide must be computed from
   ``observations'' $X_t$, that is \textit{predictions} arising from a
@@ -1921,9 +1917,9 @@ are used in the \verb@momGen@ and \verb@GPtail@ functions.
       \frac{(-1)^{j+1}}{t^{j+1}} \left[ f^{[j]}_X(\zeta_i+) -
         f^{[j]}_X(\zeta_i-) \right] \right\} \, e^{t \zeta_i}.
     $$
-  \item If $Y \sim \mathtt{GPD}(\mu_Y,\,\sigma_Y,\,\xi_Y)$, and 
-    $1/\xi_Y$ is not equal to any of the integers $1$, $2$, $\dots$, $k$ then
-    the survival function of $Z$ is given by
+  \item Assume that $Y \sim \mathtt{GPD}(0,\,\sigma_Y,\,\xi_Y)$ is independent
+    of X. Then provided that $1/\xi_Y$ is not equal to any of the integers $1$,
+    $2$, $\dots$, $k$ the survival function of $Z = X + Y$ is given by
     \begin{equation}
       \label{eq:SSplineGPD}
       S_Z(z) = \sum_{i=0}^{\ell} \, \sum_{j=k-\nu_i}^{k-1} a_j d_i^{[j]} 
@@ -1953,10 +1949,10 @@ derived w.r.t. the parameters of the GPD, this allows the
 determination of confidence intervals for the return levels based on
 the delta method.  \index{delta method}
 
-A remarkable point in the theorem is that the coefficients $a_j$ are 
-not positive. If only simple knots are used, it can be shown that
-$\sum_i a_i \zeta_i^j = 0$ for $0 \leqslant j \leqslant k-1$ hence
-the coefficients $a_j$ sum to zero.
+A remarkable point in the theorem is that the coefficients $a_j$ are not
+positive, so the tail of $Z$ is a \textit{signed mixture} of GPD tails. If only
+simple knots are used, it can be shown that $\sum_i a_i \zeta_i^j = 0$ for
+$0 \leqslant j \leqslant k-1$ hence the coefficients $a_j$ sum to zero.
 
 \subsection{Practical consequences}
 %%---------------------------------------
@@ -1967,11 +1963,11 @@ The first statement of the theorem can be used for exponential
 surges, since the cumulant generating function for the tide gives the 
 shift between the sea level tail and the surge tail, see section~\ref{ExpSurges}.
 
-The second statement of the theorem is used for the general case $\xi_Y \neq 0$. It
-allows the accurate determination of the sea level tail distribution  
-without using discrete convolution or quadratures. Since the formula
-for $S_Z(z)$ only works for $z > \Up{x} + \mu_Y$, a discrete 
-convolution must be used to compute the bulk of the distribution.
+The second statement of the theorem is used for the general case $\xi_Y \neq
+0$. It allows the accurate determination of the sea level tail distribution
+without using discrete convolution or quadratures. Since the formula for
+$S_Z(z)$ only works for large $z$, a discrete convolution must be used to
+compute the bulk of the distribution.
 
 
 

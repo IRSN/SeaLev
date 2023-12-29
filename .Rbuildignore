@@ -7,3 +7,12 @@ doc/cache
 doc/figures
 doc/Rgraphics
 doc/Old
+^\.github
+^\.git
+^.*\.Rproj$
+^\.Rproj\.user$
+README.Rmd
+README.md
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

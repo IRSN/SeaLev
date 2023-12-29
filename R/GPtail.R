@@ -53,7 +53,6 @@
 ##' the \code{ret.lev} table. A NULL value correspond to a default
 ##' vector of values.
 ##' 
-##'
 ##' @param pred.period If not \code{NULL}, a vector giving periods at
 ##' which predictions (return levels and confidence limits) should be
 ##' computed and returned in the \code{ret.lev} data.frame.
@@ -75,8 +74,7 @@
 ##' table where only rounded return periods are used after
 ##' an interpolation.
 ##'
-##'
-##' @return A list.
+##' @return A list similar to that returned by \code{\link{convSL}}.
 ##' 
 ##' @author Yves Deville
 ##'
@@ -88,6 +86,14 @@
 ##'            "shape" = 0.2 * runif(1))
 ##' res <- GPtail(x = SD.Brest, par.y = par.y, lambda = 1)
 ##' 
+##' ## change variable names
+##' varnames(res) <- c(x = "Tide", y = "Skew surge", z = "Sea level")
+##'
+##' ## plot the densities
+##' plot(res)
+##'
+##' ## plot the return level
+##' plot(res, which = 3)
 GPtail <- function(x,
                    threshold.y = NA,
                    distname.y = "GPD",
@@ -118,7 +124,7 @@ GPtail <- function(x,
     
     mc <- match.call()
     
-    if (class(x) != "SplineDensity") {
+    if (!inherits(x, "SplineDensity")) {
         stop("'x' must be an object with class \"SplineDensity\".",
              " Use the 'SplineDensity' function to create such an object.")
     }
