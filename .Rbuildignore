@@ -13,6 +13,8 @@ doc/Old
 ^\.Rproj\.user$
 README.Rmd
 README.md
+CAUTION.md
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.github$

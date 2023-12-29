@@ -32,7 +32,15 @@ Then the tail distribution of $Z$ can be computed by convolution.
 Mind that this package is quite old since it was created during the
 pre-RStudio era.
 
-# INSTALLATION
+# SeaLev Guide
+
+The package does not have any vignette as such, yet the [SeaLev
+Package guide](https://github.com/IRSN/SeaLev/blob/main/inst/doc/SeaLevGuide.pdf)
+available here is shipped with the package as a pdf file (with extra
+compression).
+
+
+# Installation
 
 ## Using the *remotes* package
 
@@ -44,15 +52,6 @@ install_github("IRSN/SeaLev", dependencies = TRUE)
 ```
 This should install the package and make it ready to use.
 
-Mind that by default this does not build the vignette shipped with the
-package (long-form documentation). To build the vignette, use instead
-
-```{r, eval=FALSE}
-install_github("IRSN/SeaLev", dependencies = TRUE, build_vignettes = TRUE)
-```
-The installation will then take a longer time but the vignette will be
-accessible from the help of the package (link above the "Help Pages"
-section).
 
 You can also select a specific branch or a specific commit by using
 the suitable syntax for `install_github`. For instance to install the

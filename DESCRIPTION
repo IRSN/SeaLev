@@ -9,3 +9,4 @@ Description: Analysis of Sea Levels using Convolution between Tide and Surge.
 Depends: R(>= 2.9.0), stats, methods, graphics, grDevices, splines, Renext, quadprog
 License: GPL (>= 2)
 LazyLoad: yes
+URL: https://irsn.github.io/SeaLev/

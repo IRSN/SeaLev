@@ -1,13 +1,13 @@
-README
+R Package SeaLev
 ================
 Yves Deville
 2023-05-22
 
-# The SeaLev package
+# Scope
 
 The **SeaLev** package is a R package funded by IRSN/Behrig. It is
 devoted to the distribution of a Sea Level random variable (r.v.) say
-$Z$ viewed as the sum of two independent r.vs $X$ and $Y$ representing
+$Z$, viewed as the sum of two independent r.vs $X$ and $Y$ representing
 the astronomical tide and the surge. More precisely the r.vs relate to a
 *tide interval* defined as the time interval separating two consecutive
 astronomical low tides. Then $X$ is the astronomical *high-tide* level
@@ -29,7 +29,14 @@ Then the tail distribution of $Z$ can be computed by convolution.
 Mind that this package is quite old since it was created during the
 pre-RStudio era.
 
-# INSTALLATION
+# SeaLev Guide
+
+The package does not have any vignette as such, yet the [SeaLev Package
+guide](https://github.com/IRSN/SeaLev/blob/main/inst/doc/SeaLevGuide.pdf)
+available here is shipped with the package as a pdf file (with extra
+compression).
+
+# Installation
 
 ## Using the *remotes* package
 
@@ -37,22 +44,10 @@ In an R session use
 
 ``` r
 library(remotes)
-install_github("IRSN/SeaLev", dependencies = TRUE, auth_token = myToken)
+install_github("IRSN/SeaLev", dependencies = TRUE)
 ```
 
-where `myToken` is *your* GitHub token. This should install the package
-and make it ready to use.
-
-Mind that by default this does not build the vignette shipped with the
-package (long-form documentation). To build the vignette, use instead
-
-``` r
-install_github("IRSN/SeaLev", dependencies = TRUE, auth_token = myToken, build_vignettes = TRUE)
-```
-
-The installation will then take a longer time but the vignette will be
-accessible from the help of the package (link above the “Help Pages”
-section).
+This should install the package and make it ready to use.
 
 You can also select a specific branch or a specific commit by using the
 suitable syntax for `install_github`. For instance to install the branch
